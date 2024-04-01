@@ -1,72 +1,41 @@
-import { useState, useContext, createContext, useEffect } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
+import { useState, useContext, useRef, createContext, useEffect } from "react";
+import "./App.css";
 import Login from "./pages/Login";
-import Home from './pages/Home'
-import Details from './pages/Details'
-import Register from './pages/Register'
-import ErrorPage from './pages/ErrorPage'
-
-export const UserContext = createContext();
-
+import Register from "./pages/Register";
+import ErrorPage from "./pages/ErrorPage";
+import Home from "./pages/Home";
 function App() {
+  const [token, setToken] = useState("");
   const navigate = useNavigate();
-
-
   useEffect(() => {
-    if (localStorage.getItem('token')) {
-      setToken(localStorage.getItem('token'));
+    if (localStorage.getItem("token")) {
+      setToken(localStorage.getItem("token"));
     }
-  }, [])
+  }, []);
 
-
-  // function ProtectedRoute({children, isAuthenticated, redirectTo = "/login"}) {
-  //   if (!isAuthenticated) {
-  //     navigate(redirectTo);
-  //   }
-
-  //   return children;
-  // }
-
-  function ProtectedRoute({ children}) {
+  function ProtectedRoute({ children }) {
     const isAuthenticated = token ? true : false;
-
     useEffect(() => {
       if (!isAuthenticated) {
-        navigate('/login');
+        navigate("/login");
       }
-    }, [isAuthenticated, navigate]);
-
-
-    return isAuthenticated ? children : null;
+    }, [isAuthenticated ? children : null]);
   }
 
   return (
     <>
       <Routes>
-        {/* Public routes */}
-
         <Route path="/login" element={<Login></Login>}></Route>
         <Route path="/register" element={<Register></Register>}></Route>
-
-        {/* Private routes */}
         <Route
           path="/"
           element={
             <ProtectedRoute isAuthenticated={token ? true : false}>
               <Home></Home>
             </ProtectedRoute>
-          } 
-        ></Route>
-
-        <Route
-          path="/details"
-          element={
-            <ProtectedRoute isAuthenticated={token ? true : false}>
-              <Details></Details>
-            </ProtectedRoute>
           }
         ></Route>
-
         <Route path="*" element={<ErrorPage></ErrorPage>}></Route>
       </Routes>
     </>
